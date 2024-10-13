@@ -1,5 +1,3 @@
-import pytest
-
 from django.urls import reverse
 
 from yanews.settings import NEWS_COUNT_ON_HOME_PAGE
