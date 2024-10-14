@@ -1,6 +1,8 @@
+import pytest
+
 from django.urls import reverse
 
-from yanews.settings import NEWS_COUNT_ON_HOME_PAGE
+from django.conf import settings
 from news.forms import CommentForm
 
 
@@ -8,7 +10,7 @@ def test_news_count(client, more_news):
     response = client.get(reverse('news:home'))
     object_list = response.context['object_list']
     news_count = object_list.count()
-    assert news_count == NEWS_COUNT_ON_HOME_PAGE
+    assert news_count == settings.NEWS_COUNT_ON_HOME_PAGE
 
 
 def test_comments_order(client, news, more_comments):
@@ -29,12 +31,15 @@ def test_news_order(client, more_news, now):
     assert all_dates == sorted_dates
 
 
-def test_anonymous_client_has_no_form(client, news):
-    response = client.get(reverse('news:detail', args=(news.id,)))
-    assert 'form' not in response.context
-
-
-def test_authorized_client_has_form(author_client, news):
-    response = author_client.get(reverse('news:detail', args=(news.id,)))
-    assert 'form' in response.context
-    assert isinstance(response.context['form'], CommentForm)
+@pytest.mark.parametrize(
+    'parametrized_client, expected_result',
+    (
+        (pytest.lazy_fixture('client'), False),
+        (pytest.lazy_fixture('author_client'), True)
+    ),
+)
+def test_clients_has_form(news, parametrized_client, expected_result):
+    response = parametrized_client.get(reverse('news:detail', args=(news.id,)))
+    assert ('form' in response.context) is expected_result
+    if expected_result:
+        assert isinstance(response.context['form'], CommentForm)

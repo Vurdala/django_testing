@@ -5,7 +5,6 @@ from http import HTTPStatus
 from django.urls import reverse
 
 
-@pytest.mark.django_db
 @pytest.mark.parametrize(
     'name',
     (

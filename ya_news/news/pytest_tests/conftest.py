@@ -91,3 +91,8 @@ def form_data_old():
 @pytest.fixture
 def form_data_new():
     return {'text': NEW_COMMENT_TEXT}
+
+
+@pytest.fixture(autouse=True)
+def enable_db_access_for_all_tests(db):
+    pass
