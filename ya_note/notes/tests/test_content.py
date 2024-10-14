@@ -1,29 +1,17 @@
-from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 
-from notes.models import Note
 from notes.forms import NoteForm
+from notes.tests.common import BaseSetUp
+from notes.models import Note
 
 User = get_user_model()
 
 
-class TestContent(TestCase):
-
+class TestContent(BaseSetUp):
     @classmethod
     def setUpTestData(cls):
-        cls.author = User.objects.create(username='Test_author')
-        cls.author_client = Client()
-        cls.author_client.force_login(cls.author)
-        cls.not_author = User.objects.create(username='Test_not_author')
-        cls.not_author_client = Client()
-        cls.not_author_client.force_login(cls.not_author)
-        cls.note = Note.objects.create(
-            title='Заголовок',
-            text='Текст',
-            slug='test_note',
-            author=cls.author
-        )
+        super(TestContent, cls).setUpTestData()
         all_news = [
             Note(
                 title=f'Новость {index}',
@@ -35,17 +23,19 @@ class TestContent(TestCase):
         ]
         Note.objects.bulk_create(all_news)
 
-    def test_note_in_list_for_author(self):
+    def test_note_in_list_for_users(self):
         url = reverse('notes:list')
-        response = self.author_client.get(url)
-        object_list = response.context['object_list']
-        self.assertIn(self.note, object_list)
-
-    def test_note_not_in_list_for_another_user(self):
-        url = reverse('notes:list')
-        response = self.not_author_client.get(url)
-        object_list = response.context['object_list']
-        self.assertNotIn(self.note, object_list)
+        author_results = (
+            (self.author_client, True),
+            (self.not_author_client, False),
+        )
+        for user, result in author_results:
+            with self.subTest(user=user, result=result):
+                response = user.get(url)
+                object_list = response.context['object_list']
+                self.assertEqual(
+                    (self.assertIn(self.note, object_list)), result
+                )
 
     def test_authorized_client_has_form(self):
         urls = (
