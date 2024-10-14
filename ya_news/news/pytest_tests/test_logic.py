@@ -1,10 +1,8 @@
-import pytest
-
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects, assertFormError
 from http import HTTPStatus
 
-from news.models import News, Comment
+from news.models import Comment
 from news.forms import BAD_WORDS, WARNING
 
 
@@ -59,7 +57,7 @@ def test_user_cant_delete_comment_of_another_user(
     news, not_author_client, comment
 ):
     comments_count = Comment.objects.count()
-    response = not_author_client.delete(
+    not_author_client.delete(
         reverse('news:delete', args=(comment.id,))
     )
     comments_count = Comment.objects.count()
