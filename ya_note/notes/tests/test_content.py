@@ -12,8 +12,8 @@ class TestContent(BaseSetUp):
     @classmethod
     def setUpTestData(cls):
         super(TestContent, cls).setUpTestData()
-    
-    #Я пытался объединить, но у меня вообще никак не получалось(((
+
+    # Я пытался объединить, но у меня вообще никак не получалось(((
     def test_note_in_list_for_author(self):
         url = reverse('notes:list')
         response = self.author_client.get(url)
