@@ -3,7 +3,7 @@ from django.urls import reverse
 
 from notes.forms import NoteForm
 from notes.tests.common import BaseSetUp
-from notes.models import Note
+
 
 User = get_user_model()
 
