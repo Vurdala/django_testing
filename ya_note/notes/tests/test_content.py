@@ -12,30 +12,18 @@ class TestContent(BaseSetUp):
     @classmethod
     def setUpTestData(cls):
         super(TestContent, cls).setUpTestData()
-        all_news = [
-            Note(
-                title=f'Новость {index}',
-                text='Просто текст.',
-                slug=f'slug_{index}',
-                author=cls.author
-            )
-            for index in range(10)
-        ]
-        Note.objects.bulk_create(all_news)
 
-    def test_note_in_list_for_users(self):
+    def test_note_in_list_for_author(self):
         url = reverse('notes:list')
-        author_results = (
-            (self.author_client, True),
-            (self.not_author_client, False),
-        )
-        for user, result in author_results:
-            with self.subTest(user=user, result=result):
-                response = user.get(url)
-                object_list = response.context['object_list']
-                self.assertEqual(
-                    (self.assertIn(self.note, object_list)), result
-                )
+        response = self.author_client.get(url)
+        object_list = response.context['object_list']
+        self.assertIn(self.note, object_list)
+
+    def test_note_not_in_list_for_another_user(self):
+        url = reverse('notes:list')
+        response = self.not_author_client.get(url)
+        object_list = response.context['object_list']
+        self.assertNotIn(self.note, object_list)
 
     def test_authorized_client_has_form(self):
         urls = (

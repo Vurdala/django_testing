@@ -42,14 +42,14 @@ class TestNoteCreation(BaseSetUp):
 
     def test_auth_user_can_create_notes(self):
         count_notes = Note.objects.count()
-        response = self.author_client.post(self.url, data=self.notes_info)
+        response = self.author_client.post(self.url, data=self.new_notes_info)
         self.assertRedirects(response, reverse('notes:success'))
         self.assertEqual(Note.objects.count(), count_notes + 1)
-        new_note = Note.objects.get()
-        self.assertEqual(new_note.title, self.notes_info['title'])
-        self.assertEqual(new_note.text, self.notes_info['text'])
-        self.assertEqual(new_note.slug, self.notes_info['slug'])
-        self.assertEqual(new_note.author, self.user)
+        new_note = Note.objects.get(slug=self.new_notes_info['slug'])
+        self.assertEqual(new_note.title, self.new_notes_info['title'])
+        self.assertEqual(new_note.text, self.new_notes_info['text'])
+        self.assertEqual(new_note.slug, self.new_notes_info['slug'])
+        self.assertEqual(new_note.author, self.author)
 
     def test_anonymous_user_cant_create_note(self):
         count_notes = Note.objects.count()

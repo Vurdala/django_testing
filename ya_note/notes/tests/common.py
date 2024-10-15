@@ -7,6 +7,7 @@ User = get_user_model()
 
 
 class BaseSetUp(TestCase):
+
     @classmethod
     def setUpTestData(cls):
         cls.author = User.objects.create(username='Test_author')
